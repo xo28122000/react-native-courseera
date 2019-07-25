@@ -1,6 +1,6 @@
-import { Card, Icon } from "react-native-elements";
+import { Card, Icon, Input, Rating } from "react-native-elements";
 import React, { Component } from "react";
-import { Text, View, ScrollView, FlatList } from "react-native";
+import { Text, View, ScrollView, Button, FlatList, Modal } from "react-native";
 import { DISHES } from "../shared/dishes";
 import { COMMENTS } from "../shared/comments";
 function RenderDish(props) {
@@ -30,7 +30,7 @@ function RenderDish(props) {
             name="pencil"
             type="font-awesome"
             color="#f50"
-            onPress={handleModalOpen()}
+            onPress={() => props.onPressModal()}
           />
         </View>
       </Card>
@@ -79,18 +79,26 @@ class DishDetail extends Component {
   static navigationOptions = {
     title: "Dish Details"
   };
-  markFavorite(dishId) {
+  markFavorite = dishId => {
     this.setState({ favorites: this.state.favorites.concat(dishId) });
-  }
-  toggleModal() {
+  };
+  toggleModal = () => {
     this.setState({ showModal: !this.state.showModal });
-  }
+  };
 
-  handleModalOpen() {
+  handleModalOpen = () => {
     this.toggleModal();
-  }
+  };
+  submitComment = () => {};
 
-  resetForm() {}
+  resetForm = () => {};
+
+  ratingCompleted = rating => {
+    this.setState({
+      rating: rating
+    });
+    console.log("Rating is: " + this.state.rating);
+  };
   render() {
     const dishId = this.props.navigation.getParam("dishId", "");
     return (
@@ -99,12 +107,62 @@ class DishDetail extends Component {
           dish={this.state.dishes[+dishId]}
           favorite={this.state.favorites.some(el => el === dishId)}
           onPress={() => this.markFavorite(dishId)}
+          onPressModal={() => this.handleModalOpen()}
         />
         <RenderComments
           comments={this.state.comments.filter(
             comment => comment.dishId === dishId
           )}
         />
+        <Modal
+          animationType={"slide"}
+          transparent={false}
+          visible={this.state.showModal}
+          onDismiss={() => this.toggleModal()}
+          onRequestClose={() => this.toggleModal()}
+        >
+          <View
+            stye={{
+              justifyContent: "center",
+              margin: 20
+            }}
+          >
+            <Text>Rating</Text>
+            <Rating
+              type="star"
+              ratingCount={5}
+              startingValue={this.state.rating}
+              imageSize={40}
+              showRating
+              onFinishRating={this.ratingCompleted}
+            />
+            <Input
+              placeholder="Author"
+              leftIcon={{ type: "font-awesome", name: "chevron-left" }}
+            />
+            <Input
+              placeholder="Comment"
+              leftIcon={{ type: "font-awesome", name: "chevron-left" }}
+            />
+            <Button
+              onPress={() => {
+                this.toggleModal();
+                this.submitComment();
+                this.resetForm();
+              }}
+              color="#512DA8"
+              title="Submit"
+            />
+            <Button
+              onPress={() => {
+                this.toggleModal();
+                this.resetForm();
+              }}
+              color="#512DA8"
+              title="Cancel"
+            />
+          </View>
+        </Modal>
       </ScrollView>
     );
   }

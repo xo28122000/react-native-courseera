@@ -23,6 +23,31 @@ import { Icon } from "react-native-elements";
 import Contact from "./ContactComponent";
 import About from "./AboutComponent";
 import Reservation from "./ReservationComponent";
+
+import { connect } from "react-redux";
+import {
+  fetchDishes,
+  fetchComments,
+  fetchPromos,
+  fetchLeaders
+} from "../redux/ActionCreators";
+
+const mapStateToProps = state => {
+  return {
+    dishes: state.dishes,
+    comments: state.comments,
+    promotions: state.promotions,
+    leaders: state.leaders
+  };
+};
+
+const mapDispatchToProps = dispatch => ({
+  fetchDishes: () => dispatch(fetchDishes()),
+  fetchComments: () => dispatch(fetchComments()),
+  fetchPromos: () => dispatch(fetchPromos()),
+  fetchLeaders: () => dispatch(fetchLeaders())
+});
+
 const ReservationNavigator = createStackNavigator(
   {
     Reservation: { screen: Reservation }
@@ -250,21 +275,29 @@ const MainNavigator = createDrawerNavigator(
     contentComponent: CustomDrawerContentComponent
   }
 );
-const App = createAppContainer(MainNavigator);
-// class Main extends Component {
-//   render() {
-//     return (
-//       <View
-//         style={{
-//           flex: 1,
-//           paddingTop: Platform.OS === "ios" ? 0 : Expo.Constants.statusBarHeight
-//         }}
-//       >
-//         <Main />
-//       </View>
-//     );
-//   }
-// }
+
+// const Main = createAppContainer(MainNavigator);
+
+class Main extends Component {
+  componentDidMount() {
+    this.props.fetchDishes();
+    this.props.fetchComments();
+    this.props.fetchPromos();
+    this.props.fetchLeaders();
+  }
+  render() {
+    return (
+      <View
+        style={{
+          flex: 1,
+          paddingTop: Platform.OS === "ios" ? 0 : Expo.Constants.statusBarHeight
+        }}
+      >
+        <MainNavigator />
+      </View>
+    );
+  }
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1
@@ -289,4 +322,7 @@ const styles = StyleSheet.create({
   }
 });
 
-export default App;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Main);

@@ -1,6 +1,6 @@
-import { Card, Icon, Input, Rating } from "react-native-elements";
+import { Card, Icon, Input, Rating, Button } from "react-native-elements";
 import React, { Component } from "react";
-import { Text, View, ScrollView, Button, FlatList, Modal } from "react-native";
+import { Text, View, ScrollView, FlatList, Modal } from "react-native";
 import { DISHES } from "../shared/dishes";
 import { COMMENTS } from "../shared/comments";
 function RenderDish(props) {
@@ -46,7 +46,13 @@ function RenderComments(props) {
     return (
       <View key={index} style={{ margin: 10 }}>
         <Text style={{ fontSize: 14 }}>{item.comment}</Text>
-        <Text style={{ fontSize: 12 }}>{item.rating} Stars</Text>
+        <Rating
+          imageSize={10}
+          readonly
+          startingValue={item.rating}
+          style={{ flex: 1, flexDirection: "row" }}
+        />
+
         <Text style={{ fontSize: 12 }}>
           {"-- " + item.author + ", " + item.date}{" "}
         </Text>
@@ -72,7 +78,9 @@ class DishDetail extends Component {
       comments: COMMENTS,
       favorites: [],
       showModal: false,
-      rating: 5
+      rating: 5,
+      author: "Author",
+      comment: "Comment"
     };
   }
 
@@ -87,11 +95,28 @@ class DishDetail extends Component {
   };
 
   handleModalOpen = () => {
-    this.toggleModal();
+    this.setState({ showModal: true });
   };
-  submitComment = () => {};
+  handleModalClose = () => {
+    this.setState({ showModal: false });
+  };
+  // handelAuthorChange = () => {};
+  // handelCommentChange = () => {};
+  submitComment = () => {
+    console.log("submit");
 
-  resetForm = () => {};
+    console.log(this.state.author);
+    console.log(this.state.comment);
+    this.handleModalClose();
+  };
+
+  resetForm = () => {
+    this.setState({ author: "Author", comment: "Comment" });
+    console.log("reset");
+    console.log(this.state.author);
+    console.log(this.state.comment);
+    this.handleModalClose();
+  };
 
   ratingCompleted = rating => {
     this.setState({
@@ -118,8 +143,8 @@ class DishDetail extends Component {
           animationType={"slide"}
           transparent={false}
           visible={this.state.showModal}
-          onDismiss={() => this.toggleModal()}
-          onRequestClose={() => this.toggleModal()}
+          onDismiss={() => this.handleModalClose()}
+          onRequestClose={() => this.handleModalClose()}
         >
           <View
             stye={{
@@ -137,29 +162,38 @@ class DishDetail extends Component {
               onFinishRating={this.ratingCompleted}
             />
             <Input
-              placeholder="Author"
-              leftIcon={{ type: "font-awesome", name: "chevron-left" }}
+              placeholder={this.state.author}
+              leftIcon={
+                <Icon name="user" type="font-awesome" style={{ margin: 3 }} />
+              }
+              onChangeText={text => this.setState({ author: text })}
             />
             <Input
-              placeholder="Comment"
-              leftIcon={{ type: "font-awesome", name: "chevron-left" }}
+              placeholder={this.state.comment}
+              leftIcon={
+                <Icon
+                  name="comment"
+                  type="font-awesome"
+                  style={{ margin: 3 }}
+                />
+              }
+              onChangeText={text => this.setState({ comment: text })}
             />
             <Button
               onPress={() => {
-                this.toggleModal();
                 this.submitComment();
-                this.resetForm();
               }}
-              color="#512DA8"
+              color="#520da6"
               title="Submit"
+              style={{ margin: 10, padding: 10 }}
             />
             <Button
               onPress={() => {
-                this.toggleModal();
                 this.resetForm();
               }}
-              color="#512DA8"
+              color="#626163"
               title="Cancel"
+              style={{ margin: 10, padding: 10 }}
             />
           </View>
         </Modal>

@@ -8,7 +8,11 @@ import {
   StyleSheet,
   Text
 } from "react-native";
-import App from "./components/MainComponent";
+import Main from "./components/MainComponent";
+import { Provider } from "react-redux";
+import { ConfigureStore } from "./redux/configureStore";
+
+const store = ConfigureStore();
 export default class HelloWorldApp extends Component {
   render() {
     return (
@@ -18,7 +22,9 @@ export default class HelloWorldApp extends Component {
           paddingTop: Platform.OS === "ios" ? 0 : Expo.Constants.statusBarHeight
         }}
       >
-        <App />
+        <Provider store={store}>
+          <Main />
+        </Provider>
       </View>
     );
   }
